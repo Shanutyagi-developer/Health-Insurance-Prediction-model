@@ -6,7 +6,7 @@ import joblib
 scaler = joblib.load("scaler.pkl")
 le_gender  = joblib.load("label_encoder_gender.pkl")
 le_diabetic = joblib.load("label_encoder_diabetic.pkl")
-le_smoker = joblib.load("Label_encoder_smoker.pkl")
+le_smoker = joblib.load("label_encoder_smoker.pkl")
 model = joblib.load("best_model.pkl")
 
 st.set_page_config(page_title = "Insurance Claim Prediction",layout = "centered")
