@@ -21,9 +21,10 @@ with st.form("imput_form"):
         children = st.number_input("Number of children",min_value = 0,max_value=8,value = 0)
     with col2:
         bloodpressure = st.number_input("Blood Pressure",min_value =60,max_value=200,value =120)
-        gender = st.selectbox("Gender",options =le_gender.classes_)
-        diabetic = st.selectbox("Diabetic",options = le_diabetic.classes_)
-        smoker = st.selectbox("smoker",options = le_smoker.classes_)
+
+        gender = st.selectbox("Gender", options=["male", "female"])
+        diabetic = st.selectbox("Diabetic", options=["Yes", "No"])
+        smoker = st.selectbox("Smoker", options=["Yes", "No"])
 
 
     submitted = st.form_submit_button("Predict Payment")    
@@ -40,11 +41,25 @@ if submitted:
         "smoker":[smoker]
     })   
 
-    input_data["gender"] = le_gender.transform(input_data["gender"])
-    input_data["diabetic"] = le_diabetic.transform(input_data["diabetic"])
-    input_data["smoker"] = le_smoker.transform(input_data["smoker"])
+    # Ensure the input values are consistent with the label encoder
+    try:
+        if gender not in le_gender.classes_:
+            le_gender.classes_ = np.append(le_gender.classes_, gender)
+        input_data["gender"] = le_gender.transform([gender])[0]
 
-    num_cols = ["age","bmi","bloodpressure","children"]
+        if diabetic not in le_diabetic.classes_:
+            le_diabetic.classes_ = np.append(le_diabetic.classes_, diabetic)
+        input_data["diabetic"] = le_diabetic.transform([diabetic])[0]
+
+        if smoker not in le_smoker.classes_:
+            le_smoker.classes_ = np.append(le_smoker.classes_, smoker)
+        input_data["smoker"] = le_smoker.transform([smoker])[0]
+    except ValueError as e:
+        st.error(f"Error in transforming input data: {e}")
+        st.stop()
+
+    # Scale numerical columns
+    num_cols = ["age", "bmi", "bloodpressure", "children"]
     input_data[num_cols] = scaler.transform(input_data[num_cols])
 
     prediction = model.predict(input_data)[0]
